@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import { MaterialIcons } from "@expo/vector-icons"; 
+import { MaterialIcons } from "@expo/vector-icons";
 
 export default function Layout() {
   return (
@@ -8,36 +8,37 @@ export default function Layout() {
       screenOptions={{
         tabBarActiveTintColor: "white",
         tabBarInactiveTintColor: "#B0BEC5",
-        tabBarShowLabel: true, // Show labels
+        tabBarShowLabel: true,
         tabBarLabelStyle: {
-          fontSize: 12, // Adjust text size
+          fontSize: 14, // Medium size for readability
           fontWeight: "600",
           textAlign: "center",
-          marginBottom: 6, // Space between text and icon
+          marginTop: -5, // Space between icon and text
         },
         tabBarIconStyle: {
           alignItems: "center",
           justifyContent: "center",
         },
         tabBarStyle: {
-          backgroundColor: "#2C3E50",
-          borderRadius: 30,
-          paddingBottom: 6,
-          paddingTop: 6,
-          marginHorizontal: 16,
-          marginBottom: 24,
-          height: 74,
+          backgroundColor: "#FF6347", // Tomato Red for Tab Bar
+          borderRadius: 25,
+          paddingBottom: 8,
+          paddingTop: 8,
+          marginHorizontal: 20,
+          marginBottom: 16,
+          height: 64, // Medium size tab bar
           position: "absolute",
           shadowColor: "#000",
-          shadowOpacity: 0.3,
-          shadowOffset: { width: 0, height: 4 },
-          shadowRadius: 8,
+          shadowOpacity: 0.2,
+          shadowOffset: { width: 0, height: 3 },
+          shadowRadius: 6,
           display: "flex",
-          justifyContent: "center", // Centers content in tab bar
+          justifyContent: "center",
           alignItems: "center",
         },
       }}
     >
+      {/* Home Tab */}
       <Tabs.Screen
         name="index"
         options={{
@@ -48,26 +49,32 @@ export default function Layout() {
           ),
         }}
       />
+
+      {/* Order Tab */}
       <Tabs.Screen
-        name="chat"
+        name="order"
         options={{
-          title: "Chats",
+          title: "Order",
           headerShown: false,
           tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="chat" size={size} color={color} />
+            <MaterialIcons name="receipt-long" size={size} color={color} />
           ),
         }}
       />
+
+      {/* Cart Tab */}
       <Tabs.Screen
-        name="rides"
+        name="cart"
         options={{
-          title: "Rides",
+          title: "Cart",
           headerShown: false,
           tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="directions-car" size={size} color={color} />
+            <MaterialIcons name="shopping-cart" size={size} color={color} />
           ),
         }}
       />
+
+      {/* Profile Tab */}
       <Tabs.Screen
         name="profile"
         options={{
