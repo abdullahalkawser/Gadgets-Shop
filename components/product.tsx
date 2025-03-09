@@ -3,18 +3,23 @@ import React from "react";
 import { View, Text, Image, StyleSheet, Pressable } from "react-native";
 
 export default function ProductList({ product }) {
+  // console.log(product)
   return (
-<Link asChild href={`/products`}>
-    <Pressable style={styles.productItem}>
-      {/* Product Image */}
-      <Image source={product.heroImage} style={styles.productImage} />
+    <Link asChild href={`/product/${product.id}`
 
-      {/* Product Title */}
-      <Text style={styles.productTitle}>{product.title}</Text>
+    
+    
+    }>
+      <Pressable style={styles.productItem}>
+        {/* Product Image */}
+        <Image source={product.heroImage} style={styles.productImage} />
 
-      {/* Product Price */}
-      <Text style={styles.productPrice}>${product.price.toFixed(3)}</Text>
-    </Pressable>
+        {/* Product Title */}
+        <Text style={styles.productTitle}>{product.title}</Text>
+
+        {/* Product Price */}
+        <Text style={styles.productPrice}>${product.price.toFixed(3)}</Text>
+      </Pressable>
     </Link>
   );
 }

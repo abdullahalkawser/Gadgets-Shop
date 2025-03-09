@@ -10,11 +10,19 @@ import {
   ScrollView,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useRouter } from "expo-router"; // For navigation
 import { PRODUCTS } from "@/assets/products"; // Assuming PRODUCTS is an array of product objects.
 import ProductList from "@/components/product";
 import CategoryList from "@/components/listHeader";
 
 export default function HomeScreen() {
+  const router = useRouter(); // Use router for navigation
+
+  // Navigate to Cart Page
+  const goToCart = () => {
+    router.push("/cart"); // Assuming "/cart" is the path to the cart page
+  };
+
   return (
     <View style={styles.container}>
       {/* Header Section */}
@@ -29,6 +37,11 @@ export default function HomeScreen() {
             Abdullah {'\n'}AL Kawser
           </Text>
         </View>
+
+        {/* Cart Icon Button */}
+        <TouchableOpacity onPress={goToCart} style={styles.cartButton}>
+          <MaterialIcons name="shopping-cart" size={24} color="white" />
+        </TouchableOpacity>
 
         {/* Logout Button */}
         <TouchableOpacity
@@ -119,6 +132,11 @@ const styles = StyleSheet.create({
     color: "#2C3E50",
     fontWeight: "bold",
     marginLeft: 6,
+  },
+  cartButton: {
+    backgroundColor: "#FF6347",
+    padding: 10,
+    borderRadius: 50,
   },
   searchBar: {
     flexDirection: "row",
