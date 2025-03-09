@@ -1,9 +1,11 @@
+import { Link } from "expo-router";
 import React from "react";
-import { View, Text, Image, StyleSheet } from "react-native";
+import { View, Text, Image, StyleSheet, Pressable } from "react-native";
 
 export default function ProductList({ product }) {
   return (
-    <View style={styles.productItem}>
+<Link asChild href={`/../components/ProductDetais/${product.slug}`}>
+    <Pressable style={styles.productItem}>
       {/* Product Image */}
       <Image source={product.heroImage} style={styles.productImage} />
 
@@ -12,7 +14,8 @@ export default function ProductList({ product }) {
 
       {/* Product Price */}
       <Text style={styles.productPrice}>${product.price.toFixed(3)}</Text>
-    </View>
+    </Pressable>
+    </Link>
   );
 }
 
