@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useLocalSearchParams } from "expo-router";
-import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, FlatList, Modal, Alert } from "react-native";
+import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, FlatList, Modal } from "react-native";
 import { PRODUCTS } from "@/assets/products";
 import { AntDesign } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -17,7 +17,7 @@ export default function ProductDetails() {
   const router = useRouter();
   const { items, addItem, increment, decrement } = useCartStore();
   const toast = useToast();
-  
+
   // Get the current quantity of the product in the cart
   const cartItem = items.find((item) => item.id === product?.id);
   const cartCount = cartItem ? cartItem.quantity : 0;
@@ -26,7 +26,6 @@ export default function ProductDetails() {
   const handleAddToCart = () => {
     if (product && cartCount === 0) {
       addItem(product, 1); // Adds the product to the cart with quantity 1 by default
-     
     }
     toast.show(`${product.title} added to cart!`, {
       type: "success",
@@ -37,6 +36,7 @@ export default function ProductDetails() {
       },
     });
   };
+
   // Handle increasing the quantity of the product
   const increaseQuantity = () => {
     if (product) {
@@ -128,21 +128,6 @@ export default function ProductDetails() {
           </View>
         </View>
 
-        <View style={styles.quantityContainer}>
-          <TouchableOpacity onPress={decreaseQuantity} style={styles.quantityButton}>
-            <Text style={styles.quantityButtonText}>-</Text>
-          </TouchableOpacity>
-          <Text style={styles.quantityText}>{cartCount}</Text>
-          <TouchableOpacity onPress={increaseQuantity} style={styles.quantityButton}>
-            <Text style={styles.quantityButtonText}>+</Text>
-          </TouchableOpacity>
-        </View>
-
-        <TouchableOpacity style={styles.cartButton} onPress={handleAddToCart}>
-          <AntDesign name="shoppingcart" size={20} color="white" />
-          <Text style={styles.cartButtonText}>Add to Cart</Text>
-        </TouchableOpacity>
-
         <FlatList
           horizontal
           data={product.imagesUrl}
@@ -172,21 +157,38 @@ export default function ProductDetails() {
           </TouchableOpacity>
         </View>
       </Modal>
+
+      <View style={styles.quantityAndCartContainer}>
+        <View style={styles.quantityContainer}>
+          <TouchableOpacity onPress={decreaseQuantity} style={styles.quantityButton}>
+            <Text style={styles.quantityButtonText}>-</Text>
+          </TouchableOpacity>
+          <Text style={styles.quantityText}>{cartCount}</Text>
+          <TouchableOpacity onPress={increaseQuantity} style={styles.quantityButton}>
+            <Text style={styles.quantityButtonText}>+</Text>
+          </TouchableOpacity>
+        </View>
+
+        <TouchableOpacity style={styles.cartButton} onPress={handleAddToCart}>
+          <AntDesign name="shoppingcart" size={20} color="white" />
+          <Text style={styles.cartButtonText}>Add to Cart</Text>
+        </TouchableOpacity>
+      </View>
     </>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
+   
     alignItems: "center",
     backgroundColor: "#fff",
   },
   heroImage: {
     width: "100%",
-    height: 400,
+    height: '300',
     resizeMode: "contain",
-    marginBottom: 20,
+  
   },
   title: {
     fontSize: 24,
@@ -212,10 +214,16 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "#FF6347",
   },
+  quantityAndCartContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",  // Ensures space between quantity control and button
+    width: "100%",  // Ensures full width usage
+    marginBottom: 20,
+  },
   quantityContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 20,
   },
   quantityButton: {
     backgroundColor: "#FF6347",
@@ -237,7 +245,6 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 15,
     borderRadius: 5,
-    marginBottom: 20,
   },
   cartButtonText: {
     color: "white",
