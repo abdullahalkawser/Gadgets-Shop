@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useCallback } from 'react';
 import { View } from 'react-native';
 import 'react-native-reanimated';
+import { ToastProvider } from 'react-native-toast-notifications';
 
 
 // Prevent splash screen from auto-hiding
@@ -18,6 +19,7 @@ export default function RootLayout() {
 
   return (
     <View onLayout={onLayoutRootView} style={{ flex: 1 }}>
+      <ToastProvider>
           <Stack>
           <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen name="(auth)" options={{ headerShown: false }} />
@@ -25,6 +27,7 @@ export default function RootLayout() {
         
           <Stack.Screen name="+not-found" />
       </Stack>
+      </ToastProvider>
        <StatusBar style="auto" />
     </View>
 

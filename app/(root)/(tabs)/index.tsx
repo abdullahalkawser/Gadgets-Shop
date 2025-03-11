@@ -14,13 +14,15 @@ import { useRouter } from "expo-router"; // For navigation
 import { PRODUCTS } from "@/assets/products"; // Assuming PRODUCTS is an array of product objects.
 import ProductList from "@/components/product";
 import CategoryList from "@/components/listHeader";
+import { useCartStore } from "@/store/cartStore";
 
 export default function HomeScreen() {
-  const router = useRouter(); // Use router for navigation
+  const router = useRouter();
+  const { getItemCount } = useCartStore();
 
   // Navigate to Cart Page
   const goToCart = () => {
-    router.push("/cart"); // Assuming "/cart" is the path to the cart page
+    router.push("/cart");
   };
 
   return (
@@ -33,20 +35,24 @@ export default function HomeScreen() {
             source={{ uri: "https://randomuser.me/api/portraits/men/41.jpg" }}
             style={styles.avatar}
           />
-          <Text style={styles.userName}>
-            Abdullah {'\n'}AL Kawser
-          </Text>
+          <Text style={styles.userName}>Abdullah AL </Text>
         </View>
 
-        {/* Cart Icon Button */}
-        <TouchableOpacity onPress={goToCart} style={styles.cartButton}>
+        {/* Cart Icon with Badge */}
+        <TouchableOpacity onPress={goToCart} style={styles.cartButton} activeOpacity={0.7}>
           <MaterialIcons name="shopping-cart" size={24} color="white" />
+          {getItemCount() > 0 && (
+            <View style={styles.cartBadge}>
+              <Text style={styles.cartBadgeText}>{getItemCount()}</Text>
+            </View>
+          )}
         </TouchableOpacity>
 
         {/* Logout Button */}
         <TouchableOpacity
           onPress={() => alert("Logged out")}
           style={styles.logoutButton}
+          activeOpacity={0.7}
         >
           <MaterialIcons name="logout" size={20} color="#2C3E50" />
           <Text style={styles.logoutText}>Logout</Text>
@@ -56,10 +62,7 @@ export default function HomeScreen() {
       {/* Search Bar */}
       <View style={styles.searchBar}>
         <MaterialIcons name="search" size={24} color="#777" />
-        <TextInput
-          placeholder="Search for products..."
-          style={styles.searchInput}
-        />
+        <TextInput placeholder="Search for products..." style={styles.searchInput} />
       </View>
 
       {/* Scrollable Content */}
@@ -68,7 +71,7 @@ export default function HomeScreen() {
         <CategoryList />
 
         {/* Product List */}
-        <Text style={styles.productext}>Product</Text>
+        <Text style={styles.productText}>Product</Text>
         <FlatList
           data={PRODUCTS}
           keyExtractor={(item) => item.id.toString()}
@@ -87,10 +90,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#f5f5f5",
   },
   scrollContainer: {
-    flexGrow: 1, // Ensures content stretches as needed
+    flexGrow: 1,
   },
   header: {
-    backgroundColor: "#FF6347", // Tomato color for a warm feel
+    backgroundColor: "#FF6347",
     paddingVertical: 30,
     paddingHorizontal: 16,
     borderBottomLeftRadius: 20,
@@ -101,7 +104,7 @@ const styles = StyleSheet.create({
     shadowColor: "#000",
     shadowOpacity: 0.2,
     shadowRadius: 8,
-    elevation: 5, // For Android shadow
+    elevation: 5,
   },
   avatarContainer: {
     flexDirection: "row",
@@ -137,6 +140,23 @@ const styles = StyleSheet.create({
     backgroundColor: "#FF6347",
     padding: 10,
     borderRadius: 50,
+    position: "relative",
+  },
+  cartBadge: {
+    position: "absolute",
+    top: -5,
+    right: -5,
+    backgroundColor: "red",
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  cartBadgeText: {
+    color: "white",
+    fontSize: 12,
+    fontWeight: "bold",
   },
   searchBar: {
     flexDirection: "row",
@@ -156,14 +176,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     paddingVertical: 10,
     marginLeft: 8,
-    height: 40,
-    fontFamily: 'Roboto', // You can choose any modern font
   },
   productList: {
     paddingBottom: 20,
     paddingTop: 10,
+    paddingHorizontal: 16,
   },
-  productext: {
+  productText: {
     fontSize: 25,
     fontWeight: "bold",
     marginTop: 10,

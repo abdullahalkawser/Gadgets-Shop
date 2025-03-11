@@ -1,35 +1,79 @@
 import React, { useState } from "react";
 import { useLocalSearchParams } from "expo-router";
-import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, FlatList, Modal } from "react-native";
-import { PRODUCTS } from "@/assets/products"; // Ensure PRODUCTS is correctly imported
-import { AntDesign } from "@expo/vector-icons"; // Importing icon from Expo
-import { useRouter } from "expo-router"; // Importing router to navigate
-import { Stack } from "expo-router"; // Import Stack to define screen headers
+import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, FlatList, Modal, Alert } from "react-native";
+import { PRODUCTS } from "@/assets/products";
+import { AntDesign } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import { Stack } from "expo-router";
+import { useCartStore } from "@/store/cartStore";
+import { useToast } from 'react-native-toast-notifications';
 
 export default function ProductDetails() {
-  const { id } = useLocalSearchParams();  
-  const product = PRODUCTS.find((p) => p.id.toString() === id); // Ensure correct ID match
-  const [cartCount, setCartCount] = useState(1); // Default to 1 item in the cart
-  const [modalVisible, setModalVisible] = useState(false); // State to control the zoom modal visibility
-  const [selectedImageIndex, setSelectedImageIndex] = useState(null); // State to store the selected image index
+  const { id } = useLocalSearchParams();
+  const product = PRODUCTS.find((p) => p.id.toString() === id);
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(null);
   const router = useRouter();
+  const { items, addItem, increment, decrement } = useCartStore();
+  const toast = useToast();
+  
+  // Get the current quantity of the product in the cart
+  const cartItem = items.find((item) => item.id === product?.id);
+  const cartCount = cartItem ? cartItem.quantity : 0;
 
-  if (!product) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.title}>Product Not Found</Text>
-        <Text style={styles.errorText}>The product you're looking for does not exist.</Text>
-      </View>
-    );
-  }
+  // Handle adding to cart
+  const handleAddToCart = () => {
+    if (product && cartCount === 0) {
+      addItem(product, 1); // Adds the product to the cart with quantity 1 by default
+     
+    }
+    toast.show(`${product.title} added to cart!`, {
+      type: "success",
+      placement: "top", // Set the position of the toast
+      duration: 2000, // Ensure it shows long enough
+      style: {
+        top: 100,       // Set the position to 100 units from the top
+      },
+    });
+  };
+  // Handle increasing the quantity of the product
+  const increaseQuantity = () => {
+    if (product) {
+      if (cartCount === 0) {
+        addItem(product, 1);  // Add the item with quantity 1 if it's not in the cart
+      } else {
+        increment(product.id);  // If the product is already in the cart, increment by 1
+      }
+      toast.show(`${product.title} added to cart!`, {
+        type: 'success',
+        placement: "top", // Set the position of the toast
+        duration: 2000, // Ensure it shows long enough
+        style: {
+          top: 100,       // Set the position to 100 units from the top
+        },
+      });
+    }
+  };
 
-  // Handle increasing and decreasing the quantity of the product
-  const increaseQuantity = () => setCartCount(cartCount + 1);
-  const decreaseQuantity = () => cartCount > 1 && setCartCount(cartCount - 1);
+  // Handle decreasing the quantity of the product
+  const decreaseQuantity = () => {
+    if (product && cartCount > 0) {
+      decrement(product.id);  // This will decrease the quantity by 1, ensuring it doesn't go below 0
+      toast.show(`${product.title} removed from cart!`, {
+        type: 'info',
+        placement: "top", // Set the position of the toast
+        duration: 2000, // Ensure it shows long enough
+        style: {
+          top: 100,       // Set the position to 100 units from the top
+        },
+      });
+    }
+  };
 
   // Navigate to the Cart page
   const goToCart = () => {
-    router.push("/cart");
+    router.push("/(root)/(tabs)/cart");
   };
 
   // Handle image click to open modal
@@ -65,22 +109,16 @@ export default function ProductDetails() {
           headerRight: () => (
             <TouchableOpacity onPress={goToCart} style={styles.cartIcon}>
               <AntDesign name="shoppingcart" size={24} color="black" />
-              {cartCount > 0 && (
-                <Text style={styles.cartCountText}>{cartCount}</Text>
-              )}
+              {cartCount > 0 && <Text style={styles.cartCountText}>{cartCount}</Text>}
             </TouchableOpacity>
           ),
         }}
       />
-
+      
       <ScrollView contentContainerStyle={styles.container}>
-        {/* Hero Image */}
         <Image source={product.heroImage} style={styles.heroImage} />
-        
-        {/* Title, Slug */}
         <Text style={styles.title}>{product.title}</Text>
 
-        {/* Price and Total Price */}
         <View style={styles.priceContainer}>
           <View style={styles.priceWrapper}>
             <Text style={styles.price}>Unit Price: ${product.price.toFixed(2)}</Text>
@@ -90,7 +128,6 @@ export default function ProductDetails() {
           </View>
         </View>
 
-        {/* Quantity Selector */}
         <View style={styles.quantityContainer}>
           <TouchableOpacity onPress={decreaseQuantity} style={styles.quantityButton}>
             <Text style={styles.quantityButtonText}>-</Text>
@@ -101,13 +138,11 @@ export default function ProductDetails() {
           </TouchableOpacity>
         </View>
 
-        {/* Add to Cart Button */}
-        <TouchableOpacity style={styles.cartButton} onPress={() => alert('Added to Cart')}>
+        <TouchableOpacity style={styles.cartButton} onPress={handleAddToCart}>
           <AntDesign name="shoppingcart" size={20} color="white" />
           <Text style={styles.cartButtonText}>Add to Cart</Text>
         </TouchableOpacity>
 
-        {/* Thumbnails of other images in a row */}
         <FlatList
           horizontal
           data={product.imagesUrl}
@@ -120,7 +155,6 @@ export default function ProductDetails() {
         />
       </ScrollView>
 
-      {/* Modal to show enlarged image */}
       <Modal visible={modalVisible} transparent={true} animationType="fade">
         <View style={styles.modalContainer}>
           <TouchableOpacity onPress={closeModal} style={styles.modalCloseButton}>
