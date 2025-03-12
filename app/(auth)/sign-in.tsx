@@ -24,7 +24,7 @@ export default function Page() {
       // If sign-in process is complete, set the created session as active
       if (signInAttempt.status === 'complete') {
         await setActive({ session: signInAttempt.createdSessionId });
-        router.replace('/(root)/(tabs)/profile');  
+        router.replace('/(root)/(tabs)');  
       } else {
         console.error('Sign-in failed', signInAttempt);
         setError('Unable to sign in. Please check your credentials.');
