@@ -1,8 +1,23 @@
 import React from "react";
 import { View, Text, TouchableOpacity, Image } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useAuth } from "@clerk/clerk-expo";
+import { useRouter } from "expo-router";
 
 export default function ProfileScreen() {
+  const { signOut } = useAuth(); // Clerk's signOut method
+  const router = useRouter(); // To navigate to other pages
+
+  // Function to handle logout
+  const handleLogout = async () => {
+    try {
+      await signOut(); // Logs the user out from Clerk
+      router.replace("/(auth)/sign-in"); // Redirects to the sign-in page
+    } catch (err) {
+      console.error("Error logging out", err);
+    }
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: "#f5f5f5", padding: 20 }}>
       {/* Profile Image Section */}
@@ -90,7 +105,7 @@ export default function ProfileScreen() {
 
       {/* Logout Button */}
       <TouchableOpacity
-        onPress={() => alert("Logged out")}
+        onPress={handleLogout}
         style={{
           backgroundColor: "#FF6347",
           padding: 14,
