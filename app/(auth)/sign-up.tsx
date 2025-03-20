@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Text, TextInput, Button, View, StyleSheet, SafeAreaView } from 'react-native';
 import { useSignUp } from '@clerk/clerk-expo';
 import { useRouter } from 'expo-router';
+import { Link } from 'expo-router'; 
 
 export default function SignUpScreen() {
   const { isLoaded, signUp, setActive } = useSignUp();
@@ -80,6 +81,12 @@ export default function SignUpScreen() {
           />
           {error && <Text style={styles.error}>{error}</Text>}
           <Button title="Continue" onPress={onSignUpPress} color="#007bff" />
+          <View style={styles.footer}>
+            <Text>Already have an account?</Text>
+            <Link href="/sign-in">
+              <Text style={styles.link}>Login</Text>
+            </Link>
+          </View>
         </View>
       )}
     </SafeAreaView>
@@ -127,5 +134,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
     marginBottom: 10,
+  },
+  footer: {
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  link: {
+    color: '#007bff',
+    fontWeight: 'bold',
   },
 });
