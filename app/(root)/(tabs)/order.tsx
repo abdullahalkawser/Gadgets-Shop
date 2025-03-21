@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, FlatList, StyleSheet, Image, Modal, Anima
 import { MaterialIcons } from "@expo/vector-icons";
 import { useCartStore } from "@/store/cartStore"; // Assuming the cart store is still available
 import { useRouter } from "expo-router";
+import PaymentScreen from "@/components/PaymentScreen";
 
 export default function OrderScreen() {
   const { items, getTotalPrice } = useCartStore();
@@ -64,13 +65,15 @@ export default function OrderScreen() {
       </View>
 
       {/* Confirm Order Button */}
-      <TouchableOpacity style={styles.confirmButton} onPress={handleConfirmOrder}>
+      {/* <TouchableOpacity style={styles.confirmButton} onPress={handleConfirmOrder}>
+   
         <Text style={styles.confirmButtonText}>Confirm Order</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
+         <PaymentScreen/>
 
       {/* Payment Button */}
       <TouchableOpacity style={styles.paymentButton} onPress={handlePayment}>
-        <Text style={styles.paymentButtonText}>Proceed to Payment</Text>
+
       </TouchableOpacity>
 
       {/* Modal for Order Confirmation */}
