@@ -1,19 +1,21 @@
-import React, { useState } from "react";
+import React from "react";
 import { View, Text, TouchableOpacity, FlatList, StyleSheet, Image } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useCartStore } from "@/store/cartStore";
 import { useRouter } from "expo-router";
 
-
 export default function CartScreen() {
   const { items, increment, decrement, removeItem, getTotalPrice } = useCartStore();
   const router = useRouter();
 
+
   // Handle checkout button click
   const handleCheckout = () => {
-    // You can redirect the user to the checkout page (e.g., /checkout)
-    router.push("/order");
-    // Or you can add a checkout process like handling payment here.
+
+    router.push({
+      pathname: "/order",
+      
+    });
   };
 
   return (
@@ -28,7 +30,6 @@ export default function CartScreen() {
         renderItem={({ item }) => (
           <View style={styles.cartItem}>
             <Image source={item.heroImage} style={styles.productImage} />
-
             <View style={styles.productDetails}>
               <Text style={styles.productTitle}>{item.title}</Text>
               <Text style={styles.productPrice}>${item.price.toFixed(2)}</Text>
@@ -62,7 +63,7 @@ export default function CartScreen() {
         )}
       />
 
-      {/* Total Price and Checkout Button on the Same Line */}
+      {/* Total Price and Checkout Button */}
       <View style={styles.totalCheckoutContainer}>
         <View style={styles.totalPriceContainer}>
           <Text style={styles.totalPriceLabel}>Total Price</Text>
@@ -90,7 +91,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 20,
     color: "#333",
-    top: 20,
   },
   cartItem: {
     flexDirection: "row",
@@ -152,24 +152,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 20,
     paddingBottom: 20,
-    backgroundColor: '#e0f7fa',  // Your background color
-    padding:20,
+    backgroundColor: '#e0f7fa',
+    padding: 20,
     marginBottom: 100,
-    // Shadow styles for iOS
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 6,
-    // Shadow styles for Android
     elevation: 5,
-    borderRadius: 10,  // Optional: To give rounded corners to the container
+    borderRadius: 10,
   },
   totalPriceContainer: {
     justifyContent: "flex-start",
     alignItems: "flex-start",
-
-
-   
   },
   totalPriceLabel: {
     fontSize: 18,
@@ -187,7 +182,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignItems: "center",
     justifyContent: "center",
-
   },
   checkoutButtonText: {
     fontSize: 18,

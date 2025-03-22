@@ -1,99 +1,106 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, FlatList, StyleSheet, Image, Modal, Animated } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
-import { useCartStore } from "@/store/cartStore"; // Assuming the cart store is still available
+import { View, Text, TouchableOpacity, StyleSheet, Alert, Modal } from "react-native";
+import { CardField, useStripe } from "@stripe/stripe-react-native";
+import { useCartStore } from "@/store/cartStore";
 import { useRouter } from "expo-router";
-import PaymentScreen from "@/components/PaymentScreen";
 
-export default function OrderScreen() {
+export default function PaymentScreen() {
+  const API_URL = "http://192.168.1.6:3000";
+  const { confirmPayment } = useStripe();
   const { items, getTotalPrice } = useCartStore();
-  const router = useRouter();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState(null);
+  const [cardDetails, setCardDetails] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [fadeAnim] = useState(new Animated.Value(0)); // Initial opacity for animation
+  const router = useRouter();
 
-  // Handle Confirm Order button click
-  const handleConfirmOrder = () => {
-    // Show the modal with animation
-    setModalVisible(true);
-    Animated.timing(fadeAnim, {
-      toValue: 1,  // Fade in effect
-      duration: 500,  // Duration of the fade-in animation
-      useNativeDriver: true,
-    }).start();
+  const fetchPaymentIntentClientSecret = async () => {
+    try {
+      const response = await fetch(`${API_URL}/create-payment-intent`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ amount: getTotalPrice() * 100 }),
+      });
 
-    // Optionally, you can add a delay before redirecting or closing the modal
-    setTimeout(() => {
-      router.push("/order-success");
-    }, 2000);  // Wait for 2 seconds before redirecting to the success page
+      const { clientSecret, error } = await response.json();
+      return { clientSecret, error };
+    } catch (error) {
+      console.error("Error fetching payment intent:", error);
+      return { error: "Network error" };
+    }
   };
 
-  // Handle Payment button click
-  const handlePayment = () => {
-    // Redirect user to payment screen or handle payment logic here
-    alert("Proceeding to Payment!");
-    router.push("/payment");
+  const handlePayment = async () => {
+    setIsProcessing(true);
+    try {
+      const { clientSecret, error } = await fetchPaymentIntentClientSecret();
+      if (error) {
+        setPaymentStatus("Payment failed");
+        Alert.alert("Payment Error", "Unable to process payment.");
+      } else {
+        const { paymentIntent, error: confirmError } = await confirmPayment(clientSecret, {
+          paymentMethodType: "Card",
+        });
+
+        if (confirmError) {
+          setPaymentStatus("Payment failed");
+          Alert.alert("Payment Error", confirmError.message);
+        } else if (paymentIntent) {
+          setPaymentStatus("Payment successful");
+          setModalVisible(true); // Show success modal
+        }
+      }
+    } catch (e) {
+      setPaymentStatus("Error making payment");
+      console.error(e);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   return (
     <View style={styles.container}>
-      {/* Order Title */}
-      <Text style={styles.orderTitle}>Your Order</Text>
+      <Text style={styles.title}>Enter Card Details:</Text>
 
-      {/* Order Item List */}
-      <FlatList
-        data={items}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.orderItem}>
-            <Image source={item.heroImage} style={styles.productImage} />
-
-            <View style={styles.productDetails}>
-              <Text style={styles.productTitle}>{item.title}</Text>
-              <Text style={styles.productPrice}>${item.price.toFixed(2)}</Text>
-
-              {/* Quantity */}
-              <Text style={styles.productQuantity}>Quantity: {item.quantity}</Text>
-            </View>
-          </View>
-        )}
+      <CardField
+        postalCodeEnabled={true}
+        placeholders={{ number: "4242 4242 4242 4242" }}
+        cardStyle={styles.cardField}
+        style={styles.cardFieldWrapper}
+        onCardChange={(card) => setCardDetails(card)}
       />
 
-      {/* Total Price */}
-      <View style={styles.totalContainer}>
-        <Text style={styles.totalLabel}>Total Price</Text>
-        <Text style={styles.totalAmount}>${getTotalPrice().toFixed(2)}</Text>
-      </View>
+      {paymentStatus && <Text style={styles.status}>{paymentStatus}</Text>}
 
-      {/* Confirm Order Button */}
-      {/* <TouchableOpacity style={styles.confirmButton} onPress={handleConfirmOrder}>
-   
-        <Text style={styles.confirmButtonText}>Confirm Order</Text>
-      </TouchableOpacity> */}
-         <PaymentScreen/>
+      <Text style={styles.totalText}>Total: ${getTotalPrice()}</Text>
 
-      {/* Payment Button */}
-      <TouchableOpacity style={styles.paymentButton} onPress={handlePayment}>
-
+      <TouchableOpacity
+        style={[styles.payButton, isProcessing && styles.payButtonDisabled]}
+        onPress={handlePayment}
+        disabled={isProcessing}
+      >
+        <Text style={styles.payButtonText}>{isProcessing ? "Processing..." : "Pay Now"}</Text>
       </TouchableOpacity>
 
-      {/* Modal for Order Confirmation */}
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalBackground}>
-          <Animated.View style={[styles.modalContent, { opacity: fadeAnim }]}>
-            <Text style={styles.modalTitle}>Order Confirmed!</Text>
-            <Text style={styles.modalMessage}>Your order has been successfully confirmed. You will be redirected shortly.</Text>
+      {/* Success Modal */}
+      <Modal animationType="slide" transparent={true} visible={modalVisible}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>🎉 Payment Successful!</Text>
+            <Text style={styles.modalText}>Thank you for your purchase.</Text>
+
             <TouchableOpacity
-              style={styles.closeModalButton}
-              onPress={() => setModalVisible(false)}
+              style={styles.closeButton}
+              onPress={() => {
+                setModalVisible(false);
+                router.push("/"); // Navigate to home or another screen
+              }}
             >
-              <Text style={styles.closeModalButtonText}>Close</Text>
+              <Text style={styles.closeButtonText}>OK</Text>
             </TouchableOpacity>
-          </Animated.View>
+          </View>
         </View>
       </Modal>
     </View>
@@ -103,145 +110,98 @@ export default function OrderScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
+    backgroundColor: "#F7F7F7",
   },
-  orderTitle: {
-    textAlign: "center",
+  title: {
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 20,
     color: "#333",
   },
-  orderItem: {
-    flexDirection: "row",
-    backgroundColor: "#fff",
-    padding: 15,
-    marginBottom: 15,
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 3,
+  cardFieldWrapper: {
+    width: "100%",
+    height: 50,
+    marginVertical: 30,
   },
-  productImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 10,
-    marginRight: 15,
+  cardField: {
+    backgroundColor: "#FFFFFF",
+    textColor: "#000000",
+    borderColor: "#CCCCCC",
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingLeft: 10,
+    paddingRight: 10,
   },
-  productDetails: {
-    flex: 1,
-    justifyContent: "space-between",
-  },
-  productTitle: {
+  status: {
     fontSize: 18,
-    fontWeight: "bold",
-    color: "#333",
-  },
-  productPrice: {
-    fontSize: 16,
-    color: "#555",
-    marginTop: 5,
-  },
-  productQuantity: {
-    fontSize: 14,
-    color: "#777",
-    marginTop: 5,
-  },
-  totalContainer: {
-    marginTop: 20,
-    backgroundColor: "#fff",
-    padding: 15,
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 3,
-  },
-  totalLabel: {
-    fontSize: 18,
-    color: "#333",
-  },
-  totalAmount: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#FF6347",
     marginTop: 10,
+    color: "#FF6347",
   },
-  confirmButton: {
+  totalText: {
+    fontSize: 20,
+    marginVertical: 10,
+    color: "#333",
+  },
+  payButton: {
     backgroundColor: "#FF6347",
     paddingVertical: 15,
-    paddingHorizontal: 30,
-    borderRadius: 5,
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 20,
+    paddingHorizontal: 60,
+    borderRadius: 30,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 4,
   },
-  confirmButtonText: {
-    fontSize: 18,
-    fontWeight: "bold",
+  payButtonDisabled: {
+    backgroundColor: "#FF7F7F",
+  },
+  payButtonText: {
     color: "#fff",
-  },
-  paymentButton: {
-    backgroundColor: "#32CD32",  // Green color for the payment button
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-    borderRadius: 5,
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 20,
-  },
-  paymentButtonText: {
     fontSize: 18,
-    fontWeight: "bold",
-    color: "#fff",
+    fontWeight: "600",
   },
-  // Modal Styles
-  modalBackground: {
+  modalContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",  // Semi-transparent background
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
-    width: 300,
-    backgroundColor: "#fff",
-    padding: 20,
-    borderRadius: 10,
+    backgroundColor: "white",
+    padding: 30,
+    borderRadius: 15,
     alignItems: "center",
-    justifyContent: "center",
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
     shadowRadius: 6,
     elevation: 5,
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: "bold",
-    color: "#32CD32",  // Green color for confirmation
+    color: "#4CAF50",
     marginBottom: 10,
   },
-  modalMessage: {
-    fontSize: 16,
+  modalText: {
+    fontSize: 18,
     color: "#333",
     marginBottom: 20,
-    textAlign: "center",
   },
-  closeModalButton: {
-    backgroundColor: "#FF6347",
+  closeButton: {
+    backgroundColor: "#4CAF50",
     paddingVertical: 10,
-    paddingHorizontal: 30,
-    borderRadius: 5,
-    alignItems: "center",
-    justifyContent: "center",
+    paddingHorizontal: 40,
+    borderRadius: 20,
   },
-  closeModalButtonText: {
-    fontSize: 16,
+  closeButtonText: {
+    color: "white",
+    fontSize: 18,
     fontWeight: "bold",
-    color: "#fff",
   },
 });
+
