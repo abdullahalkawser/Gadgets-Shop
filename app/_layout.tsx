@@ -37,7 +37,7 @@ export default function RootLayout() {
       <ToastProvider>
           <Stack>
           {/* <Stack.Screen name="index" options={{ headerShown: false }} /> */}
-          <Stack.Screen name="home" options={{ headerShown: false }} />
+          <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen name="(auth)" options={{ headerShown: false }} />
           <Stack.Screen name="(root)" options={{ headerShown: false }} />
         

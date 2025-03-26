@@ -14,7 +14,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/a.jpg",
-        "backgroundColor": "red" 
+        "backgroundColor": "red"
       }
     },
     "web": {
@@ -34,6 +34,11 @@
         }
       ]
     ],
+    "splash": {
+      "image": "./assets/images/aaaaa.png",
+      "resizeMode": "contain",
+      "backgroundColor": "red"
+    },
     "experiments": {
       "typedRoutes": true
     }

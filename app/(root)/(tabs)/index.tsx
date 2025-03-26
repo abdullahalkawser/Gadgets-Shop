@@ -35,7 +35,7 @@ export default function HomeScreen() {
             source={{ uri: "https://randomuser.me/api/portraits/men/41.jpg" }}
             style={styles.avatar}
           />
-          <Text style={styles.userName}>Abdullah AL </Text>
+      <Text style={styles.userName}>{`Abdullah AL\nKawser`}</Text>
         </View>
 
         {/* Cart Icon with Badge */}
@@ -120,6 +120,7 @@ const styles = StyleSheet.create({
   userName: {
     color: "white",
     fontSize: 18,
+    marginTop:20,
     fontWeight: "bold",
     marginLeft: 20,
   },

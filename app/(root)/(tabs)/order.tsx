@@ -5,7 +5,7 @@ import { useCartStore } from "@/store/cartStore";
 import { useRouter } from "expo-router";
 
 export default function PaymentScreen() {
-  const API_URL = "http://192.168.1.6:3000";
+  const API_URL = "http://192.168.1.5:3000";
   const { confirmPayment } = useStripe();
   const { items, getTotalPrice } = useCartStore();
   const [isProcessing, setIsProcessing] = useState(false);
