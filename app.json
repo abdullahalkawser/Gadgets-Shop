@@ -1,46 +1,26 @@
 {
   "expo": {
     "name": "Gadgets-Shop",
-    "slug": "Gadgets-Shop",
+    "slug": "gadgets-shop",
+    "icon": "./assets/images/a.png",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/a.jpg",
-    "scheme": "myapp",
-    "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
-    "ios": {
-      "supportsTablet": true
+    "splash": {
+      "image": "./assets/images/a.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/a.jpg",
-        "backgroundColor": "red"
+        "foregroundImage": "./assets/images/a.png",
+        "backgroundColor": "#000000"
+      },
+      "package": "com.abdullahalkawser.gadgetsshop"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "674f15f5-7cb8-4f1c-ae11-d438ef01b031"
       }
-    },
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/a.jpg"
-    },
-    "plugins": [
-      "expo-router",
-      [
-        "expo-splash-screen",
-        {
-          "image": "./assets/images/aaaaa.png",
-          "imageWidth": 200,
-          "resizeMode": "cover",
-          "backgroundColor": "red"
-        }
-      ]
-    ],
-    "splash": {
-      "image": "./assets/images/aaaaa.png",
-      "resizeMode": "contain",
-      "backgroundColor": "red"
-    },
-    "experiments": {
-      "typedRoutes": true
     }
   }
 }
