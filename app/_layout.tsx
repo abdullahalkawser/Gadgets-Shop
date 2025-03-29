@@ -36,7 +36,7 @@ export default function RootLayout() {
     <View onLayout={onLayoutRootView} style={{ flex: 1 }}>
       <ToastProvider>
           <Stack>
-          {/* <Stack.Screen name="index" options={{ headerShown: false }} /> */}
+         
           <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen name="(auth)" options={{ headerShown: false }} />
           <Stack.Screen name="(root)" options={{ headerShown: false }} />
