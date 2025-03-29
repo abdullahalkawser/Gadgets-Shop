@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Gadgets-Shop",
-    "slug": "gadgets-shop",
+    "name": "Gadgets",
+    "slug": "gadgetsS",
     "icon": "./assets/images/a.png",
     "version": "1.0.0",
     "orientation": "portrait",
